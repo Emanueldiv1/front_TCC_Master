@@ -3,10 +3,12 @@ import { CoordenadorComponent } from './components/coordenador/coordenador.compo
 import { OrientadorComponent } from './components/orientador/orientador.component';
 import { AlunoComponent } from './components/aluno/aluno.component';
 import { ChatAIComponent } from './components/chatai/chatai.component';
+import { WebChatComponent } from './components/web-chat/web-chat.component';
 
 export const routes: Routes = [
   { path: `coordenador`, component: CoordenadorComponent },
   { path: `orientador`, component: OrientadorComponent },
   { path: `aluno`, component: AlunoComponent },
   { path: `chat-ai`, component: ChatAIComponent },
+  { path:  'webchat/:userId', component: WebChatComponent}
 ];

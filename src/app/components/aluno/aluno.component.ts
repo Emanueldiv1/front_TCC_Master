@@ -2,7 +2,7 @@ import { AlunoService } from './../../shared/service/aluno/aluno.service';
 import { Aluno } from './../../shared/model/Aluno.model';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-aluno',
@@ -21,7 +21,7 @@ import { RouterLink } from '@angular/router';
           <img src="./assets/img/Chatting.png" />
 
           <!-- BOTAO QUE REDIRECIONA PRO CHAT COM O ORIENTADOR -->
-          <button>
+          <button (click)="IrChat()">
             <h2>Chat</h2>
             <img
               src="./assets/img/chat.png"
@@ -85,7 +85,7 @@ import { RouterLink } from '@angular/router';
 export class AlunoComponent implements OnInit {
   aluno: Aluno = new Aluno();
 
-  constructor(private alunoService: AlunoService) {}
+  constructor(private alunoService: AlunoService, private router: Router) {}
 
   ngOnInit(): void {
     this.getAlunoById('13c004d3-e431-4b70-8e32-90bcd27b7b42');
@@ -96,4 +96,9 @@ export class AlunoComponent implements OnInit {
       .getAlunoById(id)
       .subscribe((success) => (this.aluno = success));
   }
+
+  IrChat(){
+    this.router.navigate(['webchat',1]);
+  }
+
 }
