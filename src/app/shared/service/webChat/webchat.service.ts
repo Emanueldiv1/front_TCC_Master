@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { ChatMessage } from '../../model/Chat-message';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,7 @@ import { ChatMessage } from '../../model/Chat-message';
   export class WebchatService {
 
     private stompClient: any;
+    private messageSubject: BehaviorSubject<ChatMessage[]> = new BehaviorSubject<ChatMessage[]>([]); 
 
     constructor() { 
       this.initConnectionSocket(); // inicializa conexão com o socket
@@ -25,7 +27,11 @@ import { ChatMessage } from '../../model/Chat-message';
       this.stompClient.connect({}, () => {
         this.stompClient.subscribe(`/chat/mensagem/${roomId}`, (messages: any) => {
           const messageContent = JSON.parse(messages.body);
-          console.log("Mensagem recebida no frontend: ", messageContent);
+          const currentsMessage = this.messageSubject.getValue();
+          currentsMessage.push(messageContent)
+
+          this.messageSubject.next(currentsMessage)
+
         })// chamada do destinationPrefixed Backend
       })
     }
@@ -33,6 +39,10 @@ import { ChatMessage } from '../../model/Chat-message';
     // enviar mensagem
     sendMessage(roomId: string, chatMessage: ChatMessage ){
       this.stompClient.send(`/app/chat/${roomId}`, {}, JSON.stringify(chatMessage)) 
+    }
+
+    getMessageSubject(){
+      return this.messageSubject.asObservable();   
     }
 
   }
