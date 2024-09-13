@@ -31,21 +31,27 @@ export class WebChatComponent implements OnInit {
   sendMessage() {
     const chatMessage = {
       message: this.messageInput,
-      user: '1'
+      user: this.userId
     } as ChatMessage
     this.webchatService.sendMessage("SalaMensagem", chatMessage);
     this.messageInput = '';
   }
 
+  scrollToBottom(): void {
+    const messageContainer = document.querySelector('.messages');
+    if (messageContainer) {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+}
+
   lisenerMessage() {
     this.webchatService.getMessageSubject().subscribe((messages: any) => {
-      console.log('Mensagens recebidas: ', messages); // Log para verificar a recepção de mensagens
+      console.log('Mensagens recebidas: ', messages); 
       this.messageList = messages.map((item: any) => ({
         ...item,
         message_side: item.user === this.userId ? 'sender' : 'receiver'
       }));
-  
-      console.log('Lista de mensagens atualizada: ', this.messageList); // Log para verificar se messageList foi atualizado
+      this.scrollToBottom();
     });
   }
 }
