@@ -36,54 +36,80 @@ import { LoadingComponent } from '../component/loader.component';
       style="width: 100%; height: 7vh; display: flex; justify-content: center; align-items: end;"
     >
       <input
-        style="width: 90%; border-radius: 0"
+        style="width: 90%; border-radius: 5px"
         type="text"
         [(ngModel)]="messageChat"
-        placeholder="Ex. Gere 4 temas para TCC de {{ aluno.curso.nome }}"
+        placeholder="Nome do curso"
+        (keyup.enter)="enviarMessageParaAi(messageChat)"
       />
-      <input
-        type="submit"
-        style="width: 10%;height: 49px; border-radius: 0;
-    cursor: pointer;"
-        (click)="enviarMessageParaAi(messageChat)"
-        value="Enviar"
-      />
+
+      <button class="enviar" (click)="enviarMessageParaAi(messageChat)">
+        Enviar
+      </button>
+      <button class="limpar" (click)="limparMensagens()">Limpar</button>
     </footer>
   `,
-  styles: `
+  styles: ` 
   .value {
     width: 100%;
     height: 74%;
     background-color: transparent;
     color: white;
     font-size:16px;
+    padding: 10px;
     display: flex;
+    border: 1px solid #ccc;
     justify-content: end;
     align-items: start;
     padding: 5%;
     flex-direction: column;
     border: none;
-    font-family: "Montserrat", sans-serif;
+    font-family: "Montserrat";
     cursor: default;
+    overflow-y: auto;
+    line-height: 1.5;
+    white-space: pre-wrap;
+
   }
+
+  .enviar{
+    width: 10%;
+    height: 49px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 3px;
+    font-size:20px
+  }
+  
+    .limpar{
+      background-color:#ad1a1a;
+      width: 10%;
+      height: 49px;
+      border-radius: 5px;
+      border: 2px solid white;
+      background-color: transparent;
+      cursor: pointer;
+      margin-left: 5px;
+      font-size:20px;
+      color: white; 
+    }
+    .limpar:hover {
+       background-color: red; 
+       color: black; 
+    }
   `,
 })
-export class ChatAIComponent {
-  aluno: Aluno = {
-    id: '13c004d3-e431-4b70-8e32-90bcd27b7b41',
-    nome: 'Guilherme',
-    cpf: '123.123.123-12',
-    senha: '12345678.',
-    curso: { id: 2, nome: 'Ciencia da Computacao' },
-  };
-
+export class ChatAIComponent implements OnInit {
   carregando: boolean = false;
-
   textoChat: string = ``;
-
   messageChat: string = '';
+  nomeAluno: string = 'Emanuel';
 
   constructor(private serviceChatAi: ChatAiService) {}
+
+  ngOnInit() {
+    this.carregarMensagens(); // Carrega as mensagens salvas no localStorage
+  }
 
   public enviarMessageParaAi(message: string) {
     let chatForm: ChatForm = new ChatForm();
@@ -92,7 +118,72 @@ export class ChatAIComponent {
     this.serviceChatAi.generateContent(chatForm).subscribe((res) => {
       this.carregando = false;
       this.messageChat = ``;
-      this.textoChat = res.message;
+      this.scrollToBottom();
+
+      // Atualiza o texto do chat com a resposta da API, usando o nome do aluno
+      this.textoChat +=
+        '\n' +
+        this.nomeAluno +
+        ': ' +
+        message +
+        '\n' +
+        'GEMINI: ' +
+        res.message;
+
+      // Chama o método para salvar a mensagem no localStorage
+      this.salvarMensagem(message, res.message);
     });
+  }
+
+  scrollToBottom(): void {
+    const messageContainer = document.querySelector('.messages');
+    if (messageContainer) {
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+  }
+
+  private salvarMensagem(mensagemUsuario: string, respostaAI: string) {
+    // Recupera o array de mensagens do localStorage ou cria um novo se não existir
+    let mensagensSalvas = JSON.parse(
+      localStorage.getItem('chatMensagens') || '[]'
+    );
+
+    // Adiciona a nova mensagem e a resposta da AI ao array de mensagens
+    mensagensSalvas.push({
+      tipo: 'usuario',
+      conteudo: mensagemUsuario,
+      nome: this.nomeAluno, // Armazena o nome do aluno junto com a mensagem
+    });
+    mensagensSalvas.push({
+      tipo: 'ai',
+      conteudo: respostaAI,
+    });
+
+    // Salva o array atualizado no localStorage
+    localStorage.setItem('chatMensagens', JSON.stringify(mensagensSalvas));
+  }
+
+  private carregarMensagens() {
+    // Recupera o array de mensagens do localStorage
+    let mensagensSalvas = JSON.parse(
+      localStorage.getItem('chatMensagens') || '[]'
+    );
+
+    // Se houver mensagens, atualiza o textoChat com elas
+    if (mensagensSalvas.length > 0) {
+      this.textoChat = mensagensSalvas
+        .map((msg: any) => {
+          return (
+            (msg.tipo === 'usuario' ? msg.nome + ': ' : 'GEMINI: ') +
+            msg.conteudo
+          );
+        })
+        .join('\n');
+    }
+  }
+
+  public limparMensagens() {
+    localStorage.removeItem('chatMensagens');
+    this.textoChat = '';
   }
 }

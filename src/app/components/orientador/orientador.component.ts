@@ -3,6 +3,7 @@ import { Orientador } from './../../shared/model/Orientador.model';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Aluno } from '../../shared/model/Aluno.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-orientador',
@@ -39,7 +40,9 @@ import { Aluno } from '../../shared/model/Aluno.model';
             <h2 style="width: 65%; padding-left: 5%;">{{ aluno.nome }}</h2>
             <h4>{{ aluno.curso.nome }}</h4>
             <div class="chat" style="width: 20%;">
-              <img src="./assets/img/chat.png" style="height: 45px" />
+              <button (click)="irChatAluno()" class="button">
+                <img src="./assets/img/chat.png" style="height: 45px" />
+              </button>
             </div>
           </div>
           }
@@ -94,6 +97,24 @@ import { Aluno } from '../../shared/model/Aluno.model';
             align-items: center;
             justify-content: center;
           }
+          .button{
+            background-color: #0feee0;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+            position: relative;
+            &:hover {
+              background-color: #68eee5;
+            }
+          }
+          
+          .img{
+            top:50%;
+            left:50%;
+          }
         }
       }
     }
@@ -107,7 +128,7 @@ export class OrientadorComponent implements OnInit {
 
   filtro: string = '';
 
-  constructor(private orientadorService: OrientadorService) {}
+  constructor(private orientadorService: OrientadorService, private router: Router) {}
 
   ngOnInit(): void {
     this.orientadorService
@@ -126,5 +147,8 @@ export class OrientadorComponent implements OnInit {
         .includes(ev.toLowerCase());
       return nomeMatch || cursoMatch;
     });
+  }
+  irChatAluno() {
+    this.router.navigate(['webchat',2]);
   }
 }
