@@ -5,10 +5,11 @@ import { ChatForm } from '../../shared/form/chatai.form';
 import { Aluno } from '../../shared/model/Aluno.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LoadingComponent } from '../component/loader.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-chatai',
-  imports: [FormsModule, LoadingComponent],
+  imports: [FormsModule, LoadingComponent, CommonModule],
   standalone: true,
   template: `
     <header class="invert">
@@ -47,7 +48,21 @@ import { LoadingComponent } from '../component/loader.component';
         Enviar
       </button>
       <button class="limpar" (click)="limparMensagens()">Limpar</button>
+      <button class="duvida" (click)="duvida()"><strong>?</strong></button>
     </footer>
+    <div class="modal" [ngClass]="{ 'is-active': abrir }">
+      <div class="modal-content">
+        <div class="box">
+          <h2>Instruções de Uso</h2>
+          <p>
+            Insira apenas o nome do <strong>curso</strong> no campo indicado
+            para garantir que a aplicação funcione corretamente. Evite utilizar
+            perguntas no campo abaixo.
+          </p>
+          <button class="close" (click)="fechar()">Fechar</button>
+        </div>
+      </div>
+    </div>
   `,
   styles: ` 
   .value {
@@ -76,27 +91,85 @@ import { LoadingComponent } from '../component/loader.component';
     width: 10%;
     height: 49px;
     border-radius: 5px;
-    cursor: pointer;
     margin-left: 3px;
     font-size:20px
   }
+
+  .enviar:hover {
+    cursor: pointer;
+    opacity: 0.8; 
+  }
   
-    .limpar{
-      background-color:#ad1a1a;
-      width: 10%;
-      height: 49px;
-      border-radius: 5px;
-      border: 2px solid white;
-      background-color: transparent;
-      cursor: pointer;
-      margin-left: 5px;
-      font-size:20px;
-      color: white; 
-    }
-    .limpar:hover {
-       background-color: red; 
-       color: black; 
-    }
+  .limpar{
+    background-color:#ad1a1a;
+    width: 10%;
+    height: 49px;
+    border-radius: 5px;
+    border: 2px solid white;
+    background-color: transparent;
+    margin-left: 5px;
+    font-size:20px;
+    color: white; 
+  }
+
+  .limpar:hover {
+    cursor: pointer;
+     background-color: red; 
+     color: black; 
+  }
+
+  .duvida {
+    position: absolute;
+    top: 10px; 
+    right: 14px; 
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    background-color: #202124;
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+  }
+  
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    align-items: center;
+  }
+
+  .modal.is-active {
+    display: flex;
+  }
+
+  .modal .box {
+    background: #202124;
+    padding: 20px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap:12px;
+  }
+
+  
+
+
+
+  .close:hover{
+    cursor: pointer;
+    opacity: 0.8; 
+  }
+
+  .modal-content{
+    max-width:626px;
+    width: 100%;
+  }
   `,
 })
 export class ChatAIComponent implements OnInit {
@@ -104,6 +177,7 @@ export class ChatAIComponent implements OnInit {
   textoChat: string = ``;
   messageChat: string = '';
   nomeAluno: string = 'Emanuel';
+  abrir: boolean = false;
 
   constructor(private serviceChatAi: ChatAiService) {}
 
@@ -185,5 +259,13 @@ export class ChatAIComponent implements OnInit {
   public limparMensagens() {
     localStorage.removeItem('chatMensagens');
     this.textoChat = '';
+  }
+
+  duvida() {
+    this.abrir = true;
+  }
+
+  fechar() {
+    this.abrir = false;
   }
 }

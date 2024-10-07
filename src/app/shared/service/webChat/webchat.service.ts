@@ -26,15 +26,13 @@ export class WebchatService {
   // entrar no chat
   joinRoom(roomId: string) {
     this.stompClient.connect({}, () => {
-      console.log('Conectado ao chat room:', roomId);
       this.stompClient.subscribe(`/topic/${roomId}`, (messages: any) => {
         const messageContent = JSON.parse(messages.body);
-        console.log('Mensagem recebida do backend:', messageContent);
         const currentsMessage = this.messageSubject.getValue();
         currentsMessage.push(messageContent);
-        //
+        
         this.messageSubject.next(currentsMessage);
-        //
+        
       });// chamada do destinationPrefixed Backend
     });
   }

@@ -24,7 +24,7 @@ export class WebChatComponent implements OnInit {
   ) {}
   ngOnInit(): void {
     this.userId = this.route.snapshot.params['userId'];
-    this.webchatService.joinRoom('SalaMensagem'); // nome da chat
+    this.webchatService.joinRoom('SalaMensagem');
     this.lisenerMessage();
   }
 

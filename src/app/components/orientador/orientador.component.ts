@@ -40,7 +40,7 @@ import { Router } from '@angular/router';
             <h2 style="width: 65%; padding-left: 5%;">{{ aluno.nome }}</h2>
             <h4>{{ aluno.curso.nome }}</h4>
             <div class="chat" style="width: 20%;">
-              <button (click)="irChatAluno()" class="button">
+              <button (click)="irChatAluno(aluno.id)" class="button">
                 <img src="./assets/img/chat.png" style="height: 45px" />
               </button>
             </div>
@@ -148,7 +148,7 @@ export class OrientadorComponent implements OnInit {
       return nomeMatch || cursoMatch;
     });
   }
-  irChatAluno() {
-    this.router.navigate(['webchat',2]);
+  irChatAluno(alunoId: string) {
+    this.router.navigate(['webchat',alunoId]);
   }
 }
